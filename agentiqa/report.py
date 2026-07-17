@@ -3,6 +3,8 @@
 import html
 from datetime import datetime, timezone
 
+from . import CONTACT
+
 STAGES = [("product_found", "Product found"), ("added_to_cart", "Added to cart"),
           ("checkout_reached", "Checkout reached")]
 
@@ -36,6 +38,11 @@ def render(url: str, checks: list, agent: dict | None) -> str:
     else:
         agent_html = "<h2>Agent run</h2><p>Skipped (static checks only).</p>"
 
+    cta = ""
+    if CONTACT and CONTACT != "your-email@example.com":
+        cta = (f'<p class="cta">Want these issues fixed for you? '
+               f'<a href="mailto:{html.escape(CONTACT)}">{html.escape(CONTACT)}</a></p>')
+
     passed = sum(1 for c in checks if c["passed"])
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <title>AgentiQA report — {html.escape(url)}</title>
@@ -47,10 +54,12 @@ td,th{{border:1px solid #ddd;padding:.4rem .6rem;text-align:left;vertical-align:
 .stage{{padding:.6rem 1rem;border-radius:6px;font-weight:600}}
 .ok{{background:#d4f7dc;color:#116329}} .miss{{background:#ffe0e0;color:#a11}}
 .summary{{background:#f6f6f8;padding:1rem;border-radius:6px;white-space:pre-wrap}}
+.cta{{margin-top:2rem;padding:1rem;background:#eef;border-radius:6px;font-weight:600}}
 </style></head><body>
 <h1>AgentiQA — Agent readiness report</h1>
 <p><b>{html.escape(url)}</b> &middot; {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}</p>
 <h2>Static readiness checks ({passed}/{len(checks)} passed)</h2>
 <table><tr><th>Result</th><th>Check</th><th>Detail</th></tr>{check_rows}</table>
 {agent_html}
+{cta}
 </body></html>"""
