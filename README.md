@@ -4,6 +4,8 @@
 
 AI shopping agents are here (ChatGPT, Claude, Perplexity, agentic checkout). If an agent can't get through your funnel, that's revenue walking out the door — invisibly. AgentiQA sends a real AI agent (Claude + a headless browser) through your store like a customer — discover → product → cart → checkout — and reports **exactly where the agent gets stuck**, plus static agent-readiness checks. Stops before payment, always.
 
+![AgentiQA demo](docs/demo.gif)
+
 ```
 $ python -m agentiqa https://books.toscrape.com/ --goal "Buy any book"
 
