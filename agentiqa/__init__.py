@@ -4,4 +4,4 @@ __version__ = "0.1.0"
 # Override at runtime with the AGENTIQA_CONTACT env var.
 import os as _os
 
-CONTACT = _os.environ.get("AGENTIQA_CONTACT", "your-email@example.com")
+CONTACT = _os.environ.get("AGENTIQA_CONTACT", "palikaomkar@gmail.com")

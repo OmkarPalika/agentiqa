@@ -106,9 +106,9 @@ Offline, no key, no network — covers the static checks and the payment-field g
 
 ## Star history
 
-[![Star History Chart](https://api.star-history.com/svg?repos=OWNER/agentiqa&type=Date)](https://star-history.com/#OWNER/agentiqa&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=OmkarPalika/agentiqa&type=Date)](https://star-history.com/#OmkarPalika/agentiqa&Date)
 
-<!-- Replace OWNER with your GitHub username after you push. The chart renders real stars over time — empty until the first star. -->
+<!-- The chart renders real stars over time — empty until the first star. -->
 
 ## License
 
