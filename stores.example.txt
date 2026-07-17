@@ -1,0 +1,4 @@
+# One store URL per line. Blank lines and # comments are ignored.
+# Only list stores you own or have permission to test.
+https://books.toscrape.com/
+# https://your-next-store.com/

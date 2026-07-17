@@ -61,6 +61,26 @@ Output: **`agentiqa-report.html`** — the conversion funnel (product found / ad
 
 > ⚠️ **Only run against stores you own or have written permission to test.**
 
+## Benchmark many stores at once
+
+Feed it a list of store URLs and get one shareable leaderboard — the headline stat plus a per-store funnel table:
+
+```
+python -m agentiqa.batch stores.txt -o RESULTS.md
+```
+
+`stores.txt` is one URL per line (see [stores.example.txt](stores.example.txt)). Output `RESULTS.md`:
+
+```
+## 68% of stores dead-ended the agent before checkout.
+
+- Reached a product page: 92%
+- Added to cart: 54%
+- Reached checkout: 32%
+```
+
+Same safety rules apply to every store: no payment data, no accounts, no order submitted.
+
 ## How it works
 
 Two independent layers:

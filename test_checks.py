@@ -47,4 +47,22 @@ try:
 except ImportError:
     print("(skipped payment-guard test: playwright/anthropic not installed)")
 
+# batch aggregate (pure, stdlib-only import)
+from agentiqa import batch
+
+_rows = [
+    {"milestones": ["product_found", "added_to_cart", "checkout_reached"]},
+    {"milestones": ["product_found"]},
+    {"milestones": []},
+    {"error": "boom"},  # excluded from percentages
+]
+_agg = batch.aggregate(_rows)
+assert _agg["tested"] == 3 and _agg["errored"] == 1
+assert _agg["reached_checkout"] == 1 and _agg["failed_checkout"] == 2
+assert _agg["pct_failed"] == 67 and _agg["pct_reached"] == 33
+assert _agg["pct_product"] == 67  # 2 of 3 reached a product
+assert batch.furthest(["product_found", "added_to_cart"]) == "added_to_cart"
+assert batch.furthest([]) == "none"
+assert batch.aggregate([])["pct_failed"] == 0  # no divide-by-zero on empty
+
 print("all checks passed")
