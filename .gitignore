@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+# generated reports (keep docs/examples if you commit them intentionally)
+*-report.html
+agentiqa-report.html
+.claude/
+# private strategy — never publish
+docs/BUSINESS.md
+docs/LAUNCH.md
