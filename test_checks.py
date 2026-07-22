@@ -39,11 +39,26 @@ assert not r["passed"] and "ChatGPT-User: BLOCKED" in r["detail"]
 
 # payment field guard (import without playwright installed would fail — guard)
 try:
-    from agentiqa.shopper import PAYMENT_FIELD_RE
+    from agentiqa.shopper import PAYMENT_FIELD_RE, fingerprint
     for s in ("card_number", "cc-exp", "cvv", "security-code", "cardExpiry"):
         assert PAYMENT_FIELD_RE.search(s), s
     assert not PAYMENT_FIELD_RE.search("email_address")
     assert not PAYMENT_FIELD_RE.search("discount_code")
+
+    # silent-failure detection: a click that changes nothing must produce an identical fingerprint
+    class FakePage:
+        def __init__(self, url, body):
+            self.url, self._body = url, body
+
+        def inner_text(self, _sel):
+            return self._body
+
+    same = fingerprint(FakePage("https://s/", "Cart (0)"))
+    assert fingerprint(FakePage("https://s/", "Cart (0)")) == same       # nothing happened
+    assert fingerprint(FakePage("https://s/", "Cart (1)")) != same       # cart badge updated
+    assert fingerprint(FakePage("https://s/cart", "Cart (0)")) != same   # navigated
+    # real case: a dead "add to basket" reloads the same page with a bare '?' appended
+    assert fingerprint(FakePage("https://s/?", "Cart (0)")) == same
 except ImportError:
     print("(skipped payment-guard test: playwright/anthropic not installed)")
 

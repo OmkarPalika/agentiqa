@@ -3,8 +3,10 @@
 Stops before payment — enforced in code (PAYMENT_FIELD_RE guard), not just prompt.
 """
 
+import hashlib
 import json
 import re
+from urllib.parse import urlsplit, urlunsplit
 
 import anthropic
 from playwright.sync_api import sync_playwright
@@ -73,6 +75,26 @@ def snapshot(page) -> tuple[str, list]:
     return snap, handles
 
 
+def _normalize_url(url: str) -> str:
+    """Drop empty query/fragment artifacts — a bare '?' appended by a dead button is not a change."""
+    p = urlsplit(url)
+    return urlunsplit((p.scheme, p.netloc, p.path, p.query, ""))
+
+
+def fingerprint(page) -> str:
+    """Cheap page identity: normalized URL + hash of visible text. Detects actions that do nothing."""
+    try:
+        body = page.inner_text("body")
+    except Exception:
+        return _normalize_url(page.url)
+    return f"{_normalize_url(page.url)}|{hashlib.md5(body.encode('utf-8', 'ignore')).hexdigest()}"
+
+
+NO_EFFECT = ("clicked, but nothing on the page changed — same URL, same visible content. "
+             "This action produced no detectable effect (a silent failure). Do NOT click it again; "
+             "re-read the page and try a different path.")
+
+
 def is_payment_field(el) -> bool:
     for attr in ("name", "id", "autocomplete", "placeholder", "aria-label"):
         v = el.get_attribute(attr)
@@ -108,8 +130,12 @@ def build_execute(page, milestones: list, log):
         el = handles[i]
         try:
             if name == "click":
+                before = fingerprint(page)
                 el.click()
                 page.wait_for_load_state("domcontentloaded")
+                page.wait_for_timeout(400)  # let client-side updates (cart badges, drawers) land
+                if fingerprint(page) == before:
+                    return NO_EFFECT
                 return f"clicked; now at {page.url}"
             if name == "type_text":
                 if is_payment_field(el):
